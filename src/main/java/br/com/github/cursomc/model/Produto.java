@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class Produto implements Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "produto_categoria", joinColumns = @JoinColumn(name = "produto_id"), inverseJoinColumns = @JoinColumn (name = "categoria_id"))
-    private List<Categoria> categorias;
+    private List<Categoria> categorias = new ArrayList<>();
 
     @OneToMany(mappedBy = "id.produto")
     @JsonIgnore
