@@ -1,6 +1,5 @@
 package br.com.github.cursomc.service;
 
-import br.com.github.cursomc.domain.TipoCliente;
 import br.com.github.cursomc.dto.ClienteDTO;
 import br.com.github.cursomc.dto.ClienteNewDTO;
 import br.com.github.cursomc.exception.DataIntegrityException;
@@ -58,7 +57,7 @@ public class ClienteService  {
     }
 
 
-    public Cliente buildCategoria(ClienteDTO clienteDTO) {
+    public Cliente buildCliente(ClienteDTO clienteDTO) {
         return Cliente.builder().id(clienteDTO.getIdCLiente()).nome(clienteDTO.getNomeCliente()).email(clienteDTO.getEmail()).build();
     }
 
@@ -77,8 +76,8 @@ public class ClienteService  {
     }
 
     public List<ClienteDTO> findAll() {
-        List<Cliente> categorias = clienteRepository.findAll();
-        return categorias.stream().map(categoria -> new ClienteDTO(categoria)).collect(Collectors.toList());
+        List<Cliente> clientes = clienteRepository.findAll();
+        return clientes.stream().map(categoria -> new ClienteDTO(categoria)).collect(Collectors.toList());
     }
 
     public Page<Cliente> findPage(Integer page, Integer linesPerPage) {
