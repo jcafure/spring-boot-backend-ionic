@@ -1,5 +1,6 @@
 package br.com.github.cursomc.model;
 
+import br.com.github.cursomc.domain.TipoCliente;
 import br.com.github.cursomc.dto.ClienteNewDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class Cliente implements Serializable {
 
     @OneToMany(mappedBy = "cliente")
     @JsonIgnore
-    private List<Pedido> pedidos;
+    private List<Pedido> pedidos = new ArrayList<>();
 
     public Cliente(ClienteNewDTO clienteNewDTO) {
         this.nome = clienteNewDTO.getNome();
@@ -47,5 +48,12 @@ public class Cliente implements Serializable {
         this.tipo = clienteNewDTO.getTipo();
 
 
+    }
+
+    public Cliente(String nome, String email, String s1, TipoCliente pessoaFisica) {
+        this.nome = nome;
+        this.email = email;
+        this.cpfOuCnpj = s1;
+        this.tipo = pessoaFisica.getCodigo();
     }
 }

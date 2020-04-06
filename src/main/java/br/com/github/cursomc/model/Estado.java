@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -22,7 +23,10 @@ public class Estado implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy="estado")
-    private List<Cidade> cidades;
+    private List<Cidade> cidades = new ArrayList<>();
 
 
+    public Estado(String nome) {
+        this.nome = nome;
+    }
 }

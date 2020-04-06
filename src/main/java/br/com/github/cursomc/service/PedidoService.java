@@ -2,10 +2,7 @@ package br.com.github.cursomc.service;
 
 import br.com.github.cursomc.domain.EstadoPagamento;
 import br.com.github.cursomc.exception.ObjetoNaoEncontradoException;
-import br.com.github.cursomc.model.ItemPedido;
-import br.com.github.cursomc.model.PagamentoComBoleto;
-import br.com.github.cursomc.model.Pedido;
-import br.com.github.cursomc.model.Produto;
+import br.com.github.cursomc.model.*;
 import br.com.github.cursomc.repository.ItemPedidoRepository;
 import br.com.github.cursomc.repository.PagamentoRepository;
 import br.com.github.cursomc.repository.PedidoRepository;
@@ -47,11 +44,10 @@ public class PedidoService {
     @Transactional
     public Pedido insert(Pedido pedido) {
         Pedido pedidoInsert = new Pedido();
-
         pedidoInsert.setInstante(new Date());
         pedidoInsert.setCliente(clienteService.findbyId(pedido.getCliente().getId()));
         pedidoInsert.setPagamento(pedido.getPagamento());
-        pedidoInsert.getPagamento().setEstadoPagamento(EstadoPagamento.PENDENTE);
+        pedidoInsert.getPagamento().setEstadoPagamento(EstadoPagamento.PENDENTE.getCod());
         pedidoInsert.getPagamento().setPedido(pedido);
         if (pedidoInsert.getPagamento() instanceof PagamentoComBoleto) {
             PagamentoComBoleto pagto = (PagamentoComBoleto) pedidoInsert.getPagamento();
@@ -61,13 +57,13 @@ public class PedidoService {
 
         pagamentoRepository.save(pedidoInsert.getPagamento());
 
-        for (ItemPedido ip : pedido.getItens()) {
-            ip.setDesconto(0.0);
-            ip.setProduto(produtoRepository.getOne(ip.getProduto().getId()));
-            ip.setPreco(ip.getProduto().getPreco());
-            ip.setPedido(pedidoInsert);
+        for (ItemPedido itemPedido : pedido.getItens()) {
+            itemPedido.setDesconto(0.0);
+            itemPedido.setProduto(produtoRepository.getOne(itemPedido.getProduto().getId()));
+            itemPedido.setPreco(itemPedido.getProduto().getPreco());
+            itemPedido.setPedido(pedidoInsert);
         }
-
+        itemPedidoRepository.saveAll(pedido.getItens());
         // emailService.sendOrderConfirmationEmail(pedido);
         return pedido;
     }

@@ -1,5 +1,6 @@
 package br.com.github.cursomc.model;
 
+import br.com.github.cursomc.domain.EstadoPagamento;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,9 @@ public class PagamentoComBoleto extends Pagamento {
     @JsonFormat(pattern="dd/MM/yyyy")
     private Date dataPagamento;
 
-
+    public PagamentoComBoleto(Integer id, EstadoPagamento estado, Pedido pedido, Date dataVencimento, Date dataPagamento) {
+        super(id, estado, pedido);
+        this.dataPagamento = dataPagamento;
+        this.dataVencimento = dataVencimento;
+    }
 }

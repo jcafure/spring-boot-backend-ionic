@@ -21,12 +21,19 @@ public class Pagamento implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private EstadoPagamento estadoPagamento;
+    private Integer estadoPagamento;
 
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "pedido_id")
     @MapsId
     private Pedido pedido;
+
+    public Pagamento(Integer id, EstadoPagamento estado, Pedido pedido) {
+        super();
+        this.id = id;
+        this.estadoPagamento = estado.getCod();
+        this.pedido = pedido;
+    }
 
 }

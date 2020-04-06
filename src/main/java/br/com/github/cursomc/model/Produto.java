@@ -33,6 +33,11 @@ public class Produto implements Serializable {
     @JsonIgnore
     private Set<ItemPedido> itens = new HashSet<>();
 
+    public Produto(String nome, double valor) {
+        this.nome = nome;
+        this.preco = valor;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
