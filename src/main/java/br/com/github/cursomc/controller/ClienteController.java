@@ -67,11 +67,4 @@ public class ClienteController {
         Page<ClienteDTO> clienteDTOS = list.map(obj -> new ClienteDTO(obj));
         return ResponseEntity.ok().body(clienteDTOS);
     }
-//
-//    @RequestMapping(method = RequestMethod.GET)
-//    public ResponseEntity<?> getModel() {
-//        ClienteNewDTO clienteNewDTO = new ClienteNewDTO();
-//        return ResponseEntity.ok(clienteNewDTO);
-//    }
-
 }

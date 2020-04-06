@@ -23,7 +23,7 @@ public class Pedido implements Serializable {
 
     private Date instante;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Pagamento pagamento;
 
     @ManyToOne
@@ -34,7 +34,7 @@ public class Pedido implements Serializable {
     @JoinColumn(name="endereco_de_entrega_id")
     private Endereco enderecoDeEntrega;
 
-    @OneToMany(mappedBy="id.pedido")
+    @OneToMany(mappedBy="id.pedido", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<ItemPedido> itens = new HashSet<>();
 
 }

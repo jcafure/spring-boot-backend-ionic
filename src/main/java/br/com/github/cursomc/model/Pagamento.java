@@ -20,6 +20,7 @@ public class Pagamento implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private EstadoPagamento estadoPagamento;
 
     @JsonIgnore

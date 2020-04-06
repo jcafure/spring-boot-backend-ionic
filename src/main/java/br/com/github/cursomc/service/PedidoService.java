@@ -5,14 +5,16 @@ import br.com.github.cursomc.exception.ObjetoNaoEncontradoException;
 import br.com.github.cursomc.model.ItemPedido;
 import br.com.github.cursomc.model.PagamentoComBoleto;
 import br.com.github.cursomc.model.Pedido;
+import br.com.github.cursomc.model.Produto;
+import br.com.github.cursomc.repository.ItemPedidoRepository;
 import br.com.github.cursomc.repository.PagamentoRepository;
 import br.com.github.cursomc.repository.PedidoRepository;
 import br.com.github.cursomc.repository.ProdutoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PedidoService {
@@ -22,18 +24,18 @@ public class PedidoService {
     private final ProdutoRepository produtoRepository;
     private final ClienteService clienteService;
     private final BoletoService boletoService;
-    private final ProdutoService produtoService;
+    private final ItemPedidoRepository itemPedidoRepository;
 
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, PagamentoRepository pagamentoRepository,
-                         ProdutoRepository produtoRepository, ClienteService clienteService, BoletoService boletoService, ProdutoService produtoService) {
+                         ProdutoRepository produtoRepository, ClienteService clienteService, BoletoService boletoService, ProdutoService produtoService, ItemPedidoRepository itemPedidoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.pagamentoRepository = pagamentoRepository;
         this.produtoRepository = produtoRepository;
         this.clienteService = clienteService;
         this.boletoService = boletoService;
-        this.produtoService = produtoService;
+        this.itemPedidoRepository = itemPedidoRepository;
     }
 
     public Pedido findById(Integer id) {
@@ -42,26 +44,31 @@ public class PedidoService {
                 new ObjetoNaoEncontradoException("Objeto não encontrado! ID: " + id + "tipo " + Pedido.class.getName()));
     }
 
+    @Transactional
     public Pedido insert(Pedido pedido) {
-        pedido.setId(null);
-        pedido.setInstante(new Date());
-        pedido.setCliente(clienteService.findbyId(pedido.getCliente().getId()));
-        pedido.getPagamento().setEstadoPagamento(EstadoPagamento.PENDENTE);
-        pedido.getPagamento().setPedido(pedido);
-        if (pedido.getPagamento() instanceof PagamentoComBoleto) {
-            PagamentoComBoleto pagto = (PagamentoComBoleto) pedido.getPagamento();
-            boletoService.preencherPagamentoComBoleto(pagto, pedido.getInstante());
-        }
-        pedido = pedidoRepository.save(pedido);
-        pagamentoRepository.save(pedido.getPagamento());
-        for (ItemPedido ip : pedido.getItens()) {
-                ip.setDesconto(0.0);
-                ip.setPreco(ip.getId().getProduto().getPreco());
-                ip.getId().setPedido(pedido);
+        Pedido pedidoInsert = new Pedido();
 
+        pedidoInsert.setInstante(new Date());
+        pedidoInsert.setCliente(clienteService.findbyId(pedido.getCliente().getId()));
+        pedidoInsert.setPagamento(pedido.getPagamento());
+        pedidoInsert.getPagamento().setEstadoPagamento(EstadoPagamento.PENDENTE);
+        pedidoInsert.getPagamento().setPedido(pedido);
+        if (pedidoInsert.getPagamento() instanceof PagamentoComBoleto) {
+            PagamentoComBoleto pagto = (PagamentoComBoleto) pedidoInsert.getPagamento();
+            boletoService.preencherPagamentoComBoleto(pagto, pedidoInsert.getInstante());
         }
-        //itemPedidoRepository.saveAll(pedido.getItens());
-       // emailService.sendOrderConfirmationEmail(pedido);
+        pedidoRepository.save(pedidoInsert);
+
+        pagamentoRepository.save(pedidoInsert.getPagamento());
+
+        for (ItemPedido ip : pedido.getItens()) {
+            ip.setDesconto(0.0);
+            ip.setProduto(produtoRepository.getOne(ip.getProduto().getId()));
+            ip.setPreco(ip.getProduto().getPreco());
+            ip.setPedido(pedidoInsert);
+        }
+
+        // emailService.sendOrderConfirmationEmail(pedido);
         return pedido;
     }
 }
