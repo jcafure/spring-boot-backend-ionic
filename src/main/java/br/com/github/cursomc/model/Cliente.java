@@ -27,6 +27,8 @@ public class Cliente implements Serializable {
     private Integer id;
     private String nome;
     private String email;
+    @JsonIgnore
+    private String senha;
     private String cpfOuCnpj;
     private Integer tipo;
 
@@ -40,20 +42,25 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cliente")
     @JsonIgnore
     private List<Pedido> pedidos = new ArrayList<>();
+//
+//    public Cliente(ClienteNewDTO clienteNewDTO) {
+//        this.nome = clienteNewDTO.getNome();
+//        this.email = clienteNewDTO.getEmail();
+//        this.cpfOuCnpj = clienteNewDTO.getCpfOuCnpj();
+//        this.tipo = clienteNewDTO.getTipo();
+//        this.senha = clienteNewDTO.getSenha();
+//
+//    }
 
-    public Cliente(ClienteNewDTO clienteNewDTO) {
-        this.nome = clienteNewDTO.getNome();
-        this.email = clienteNewDTO.getEmail();
-        this.cpfOuCnpj = clienteNewDTO.getCpfOuCnpj();
-        this.tipo = clienteNewDTO.getTipo();
-
-
-    }
-
-    public Cliente(String nome, String email, String s1, TipoCliente pessoaFisica) {
+    public Cliente(String nome, String email, String s1, TipoCliente pessoaFisica, String encode) {
         this.nome = nome;
         this.email = email;
         this.cpfOuCnpj = s1;
         this.tipo = pessoaFisica.getCodigo();
+        this.senha = encode;
+    }
+
+    public Cliente(Integer idCLiente, String nomeCliente, String email, Object o, Object o1, Object o2) {
+
     }
 }

@@ -1,10 +1,10 @@
 package br.com.github.cursomc.service;
 
-import br.com.github.cursomc.domain.EstadoPagamento;
 import br.com.github.cursomc.domain.TipoCliente;
 import br.com.github.cursomc.model.*;
 import br.com.github.cursomc.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -29,13 +29,15 @@ public class DBService {
     @Autowired
     private final PedidoRepository pedidoRepository;
     @Autowired
+    private final BCryptPasswordEncoder passwordEncoder;
+    @Autowired
     private final PagamentoRepository pagamentoRepository;
     @Autowired
     private final ItemPedidoRepository itemPedidoRepository;
 
     public DBService(CategoriaRepository categoriaRepository, ProdutoRepository produtoRepository, EstadoRepository estadoRepository,
                      CidadeRepository cidadeRepository, ClienteRepository clienteRepository, EnderecoRepository enderecoRepository,
-                     PedidoRepository pedidoRepository, PagamentoRepository pagamentoRepository, ItemPedidoRepository itemPedidoRepository) {
+                     PedidoRepository pedidoRepository, BCryptPasswordEncoder passwordEncoder, PagamentoRepository pagamentoRepository, ItemPedidoRepository itemPedidoRepository) {
         this.categoriaRepository = categoriaRepository;
         this.produtoRepository = produtoRepository;
         this.estadoRepository = estadoRepository;
@@ -43,6 +45,7 @@ public class DBService {
         this.clienteRepository = clienteRepository;
         this.enderecoRepository = enderecoRepository;
         this.pedidoRepository = pedidoRepository;
+        this.passwordEncoder = passwordEncoder;
         this.pagamentoRepository = pagamentoRepository;
         this.itemPedidoRepository = itemPedidoRepository;
     }
@@ -61,7 +64,6 @@ public class DBService {
         p1.getCategorias().add(cat1);
         p1.getCategorias().add(cat1);
         p1.getCategorias().add(cat1);
-
 
         cat1.getProdutos().addAll(Arrays.asList(p1, p2, p3));
 
@@ -86,7 +88,7 @@ public class DBService {
         estadoRepository.saveAll(Arrays.asList(est1, est2));
         cidadeRepository.saveAll(Arrays.asList(c1, c2, c3));
 
-        Cliente cli1 = new Cliente( "Maria Silva", "nelio.cursos@gmail.com", "36378912377", TipoCliente.PESSOA_FISICA);
+        Cliente cli1 = new Cliente( "Maria Silva", "nelio.cursos@gmail.com", "36378912377", TipoCliente.PESSOA_FISICA, passwordEncoder.encode("123"));
 
         cli1.getTelefones().addAll(Arrays.asList("27363323", "93838393"));
 

@@ -1,5 +1,6 @@
 package br.com.github.cursomc.service;
 
+import br.com.github.cursomc.domain.TipoCliente;
 import br.com.github.cursomc.dto.ClienteDTO;
 import br.com.github.cursomc.dto.ClienteNewDTO;
 import br.com.github.cursomc.exception.DataIntegrityException;
@@ -15,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +30,14 @@ public class ClienteService  {
     private final ClienteRepository clienteRepository;
     private final CidadeRepository cidadeRepository;
     private final EnderecoRepository enderecoRepository;
-
+    private final BCryptPasswordEncoder passwordEncoder;
     @Autowired
-    public ClienteService(ClienteRepository clienteRepository, CidadeRepository cidadeRepository, EnderecoRepository enderecoRepository) {
+    public ClienteService(ClienteRepository clienteRepository, CidadeRepository cidadeRepository,
+                          EnderecoRepository enderecoRepository, BCryptPasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
         this.cidadeRepository = cidadeRepository;
         this.enderecoRepository = enderecoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Cliente findbyId(Integer id) {
@@ -80,13 +84,23 @@ public class ClienteService  {
         return clientes.stream().map(categoria -> new ClienteDTO(categoria)).collect(Collectors.toList());
     }
 
+    public Cliente fromDTO(ClienteDTO objDto) {
+        return new Cliente(objDto.getIdCLiente(), objDto.getNomeCliente(), objDto.getEmail(), null, null, null);
+    }
+
     public Page<Cliente> findPage(Integer page, Integer linesPerPage) {
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.ASC, "nome");
         return clienteRepository.findAll(pageRequest);
     }
 
     public Cliente buildClienteFromDTO(ClienteNewDTO clienteNewDTO) {
-        Cliente cliente = new Cliente(clienteNewDTO);
+        Cliente cliente = new Cliente();
+        cliente.setNome(clienteNewDTO.getNome());
+        cliente.setEmail(clienteNewDTO.getEmail());
+        cliente.setCpfOuCnpj(clienteNewDTO.getCpfOuCnpj());
+        cliente.setTipo(TipoCliente.toEnum(clienteNewDTO.getTipo()));
+        cliente.setSenha(passwordEncoder.encode(clienteNewDTO.getSenha()));
+
         //Cidade cidade = new Cidade(clienteNewDTO);
         Optional<Cidade> cidade = cidadeRepository.findById(clienteNewDTO.getCidadeId());
         Endereco endereco = new Endereco(clienteNewDTO, cliente, cidade.get());
